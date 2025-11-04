@@ -7,25 +7,37 @@ from contextlib import asynccontextmanager
 from .tasks.sync_data import update_shop_status 
 from .core.database import SessionLocal
 import httpx
+from sqlalchemy import text
+from .models.cosmetic import Cosmetic
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Iniciando aplicação...")
-    print("Rodando 'update_shop_status' para sincronizar a loja...")
-    
     db = SessionLocal()
     async with httpx.AsyncClient(timeout=30.0) as client:
         try:
-            # Rodamos o script de update rápido
+            #Verifica se a tabela de cosméticos está vazia
+            cosmetic_count = db.execute(text("SELECT COUNT(id) FROM cosmetics")).scalar()
+            
+            if cosmetic_count == 0:
+                print("Banco de dados vazio. Rodando Sincronização Mestra (pode demorar)...")
+                await sync_all_cosmetics(db, client)
+            else:
+                print("Banco de dados já populado.")
+
+            #Roda a atualização rápida da loja (sempre)
+            print("Rodando 'update_shop_status' para sincronizar a loja...")
             await update_shop_status(db, client)
             print("Sincronização da loja na inicialização concluída.")
+            
+            
         except Exception as e:
             print(f"ERRO ao sincronizar a loja na inicialização: {e}")
         finally:
             db.close()
     
     yield
-
     print("Desligando aplicação...")
 
 

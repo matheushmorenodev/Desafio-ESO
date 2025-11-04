@@ -15,10 +15,9 @@ from ..models.user import User
 # --- Hashing de Senha ---
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# --- DEFINIÇÃO DOS ESQUEMAS (DEVE VIR ANTES DAS FUNÇÕES) ---
 oauth2_scheme_strict = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
-# --- FIM DAS DEFINIÇÕES ---
+
 
 def truncate_password(password: str) -> str:
     return password[:72] 
@@ -48,7 +47,6 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     )
     return encoded_jwt
 
-# --- FUNÇÃO DE DEPENDÊNCIA OBRIGATÓRIA ---
 async def get_current_active_user(
     token: str = Depends(oauth2_scheme_strict), # Agora 'oauth2_scheme_strict' existe
     db: Session = Depends(get_db)
@@ -77,7 +75,6 @@ async def get_current_active_user(
         raise credentials_exception
     return user
 
-# --- FUNÇÃO DE DEPENDÊNCIA OPCIONAL ---
 async def get_optional_current_user(
     token: Optional[str] = Depends(oauth2_scheme_optional), # Agora 'oauth2_scheme_optional' existe
     db: Session = Depends(get_db)
