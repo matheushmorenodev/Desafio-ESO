@@ -27,3 +27,24 @@ Você precisará de dois terminais abertos para rodar o backend e o frontend sim
 ```bash
 git clone <url-do-seu-repositorio>
 cd desafio-eso
+```
+### 2. Terminal 1
+```bash
+cd backend
+docker-compose up --build
+Espere até aparecer a seguinte mensagem:
+eso_api_service | Sincronização da loja na inicialização concluída.
+eso_api_service | INFO:    Application startup complete.
+eso_api_service | INFO:    Uvicorn running on [http://0.0.0.0:8000](http://0.0.0.0:8000) (Press CTRL+C to quit)
+```
+### 3. Terminal 2
+```bash
+cd frontend
+docker-compose up --build
+Espere até aparecer a seguinte mensagem:
+eso_frontend_service | > Local: http://localhost:5173/
+```
+### 4. Para acessar a aplicação
+```bash
+http://localhost:5173
+
