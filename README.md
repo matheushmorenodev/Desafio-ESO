@@ -1,97 +1,49 @@
 # Desafio Técnico - Sistema ESO (Processo Seletivo)
 
-Esta é uma aplicação web full-stack (Frontend + Backend) que implementa uma loja de cosméticos do Fortnite, conforme os requisitos.
+Esta é uma aplicação web full-stack (Frontend + Backend) que implementa uma loja de cosméticos do Fortnite. O projeto foi desenvolvido conforme os requisitos do processo seletivo e está **100% implantado (deployed) na nuvem**.
 
-A aplicação é 100% orquestrada com Docker Compose em uma arquitetura de "dois terminais", separando os serviços de frontend e backend.
+---
+
+## 🚀 Links da Aplicação (Deploy)
+
+* **Frontend (React):** [https://desafio-eso.vercel.app](https://desafio-eso.vercel.app)
+* **Backend (FastAPI):** [https://eso-api.onrender.com](https://eso-api.onrender.com)
+* **(Endpoint de Teste):** [https://eso-api.onrender.com/api/cosmetics?limit=1](https://eso-api.onrender.com/api/cosmetics?limit=1)
+
+*(**Nota Importante:** O plano gratuito do Render "adormece" a API após 15 minutos de inatividade. O primeiro carregamento do catálogo ou o primeiro login podem demorar de **30 a 50 segundos** enquanto o servidor "acorda". Após a primeira requisição, a aplicação volta à velocidade normal.)*
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
-* **Backend:** Python 3.11, FastAPI, SQLAlchemy, JWT (Passlib), PyMySQL (via `mysqlclient`).
-* **Frontend:** React 20, Vite, React Router, Axios, Context API.
-* **Banco de Dados:** MySQL 8.0
-* **Infraestrutura:** Docker & Docker Compose
+* **Frontend:** React 18, Vite, React Router, Axios, Context API.
+* **Backend:** Python 3.11, FastAPI, SQLAlchemy, JWT (Passlib).
+* **Banco de Dados:** PostgreSQL (Hospedado no Render).
+* **Plataforma de Deploy:**
+    * **Frontend:** Vercel (CI/CD a partir do GitHub).
+    * **Backend:** Render (Hospedado como um Web Service).
 
 ---
 
-## 🚀 Como Rodar a Aplicação (Método de 2 Terminais)
+## 🏛️ Decisões Técnicas e Arquitetura
 
-Você precisará de dois terminais abertos para rodar o backend e o frontend simultaneamente.
+Com base nos requisitos do PDF sobre "Organização, clareza e simplicidade do código", as seguintes decisões foram tomadas:
 
-### Pré-requisitos
-* Docker e Docker Compose instalados.
-* Git.
+### Backend (Render)
 
-### 1. Clonar o Repositório
-```bash
-git clone <url-do-seu-repositorio>
-cd desafio-eso
-```
-### 2. Terminal 1
-```bash
-cd backend
-docker-compose up --build
-Espere até aparecer a seguinte mensagem:
-eso_api_service | Sincronização da loja na inicialização concluída.
-eso_api_service | INFO:    Application startup complete.
-eso_api_service | INFO:    Uvicorn running on [http://0.0.0.0:8000](http://0.0.0.0:8000) (Press CTRL+C to quit)
-```
-### 3. Terminal 2
-```bash
-cd frontend
-docker-compose up --build
-Espere até aparecer a seguinte mensagem:
-eso_frontend_service | > Local: http://localhost:5173/
-```
-### 4. Para acessar a aplicação
-```bash
-http://localhost:5173
-```
+* **Arquitetura Limpa:** A API utiliza um padrão de **Repositório** para desacoplar a lógica de negócio (nos "routers") da lógica de acesso ao banco de dados (nos "repositórios").
+* **Servidor de Produção:** A API é servida usando **Gunicorn** com workers `uvicorn` e a flag `--preload` para gerenciar a inicialização de múltiplos workers sem conflitos de banco de dados (`deadlock`).
+* **Sincronização Automatizada (Lifespan):**
+    1.  **"Seeding" (População):** Para contornar o limite de 512MB de RAM do Render, o banco de dados PostgreSQL foi populado ("semeado") manualmente uma vez com os +13.000 cosméticos usando um script local (`seed_prod_db.py`).
+    2.  **Atualização da Loja:** A API usa o `lifespan` do FastAPI para **atualizar a loja automaticamente** (`update_shop_status`) toda vez que o servidor inicia (ou "acorda"). Isso garante que os dados de preço e status (`is_on_sale`) estejam sempre corretos e ao vivo, sem necessidade de CRON.
+* **Segurança (CORS):** O `CORSMiddleware` do FastAPI foi configurado para aceitar requisições apenas dos domínios de produção do Vercel (`desafio-eso.vercel.app`) e do `localhost` (para desenvolvimento).
+
+### Frontend (Vercel)
+
+* **Gerenciamento de Estado Global:** O estado global (usuário, saldo de V-Bucks e inventário) é gerenciado centralmente pelo **`AuthContext`** (Context API).
+* **Experiência de Usuário (UX) Reativa:** Quando um usuário compra ou devolve um item, o `AuthContext` é atualizado (o saldo de V-Bucks e o inventário). Isso faz com que todos os componentes (Navbar, Catálogo e Painel de Detalhes) **atualizem instantaneamente**, sem a necessidade de o usuário recarregar a página (F5).
+* **Refatoração:** Componentes de UI reutilizáveis (como `Button.jsx` e `Input.jsx`) foram criados para manter o código das páginas (como `Login.jsx`) limpo e fácil de manter.
+* **Rotas Protegidas:** O `ProtectedRoute.jsx` protege rotas privadas (como `/profile`) e o `get_optional_current_user` no backend permite que rotas públicas (como `/cosmetics`) mostrem informações "bônus" (como `is_acquired`) se o usuário estiver logado.
+
 ---
-
-## Endpoints da API
-
-A API estará disponível em `https://desafio-eso.vercel.app/`. Todos os endpoints principais são prefixados com `/api/`.
-
-Endpoints marcados com **[PROTEGIDO]** requerem um `Bearer Token` no cabeçalho `Authorization`.
-
-### Autenticação (`/api/auth`)
-
-| Método | Endpoint | Descrição |
-| :--- | :--- | :--- |
-| `POST` | `/api/auth/register` | Registra um novo usuário. Requer `email` e `password` (com regras de complexidade). Retorna o usuário criado com 10.000 V-Bucks. |
-| `POST` | `/api/auth/login` | Autentica um usuário (usando `username` e `password` em `x-www-form-urlencoded`). Retorna um token JWT. |
-
-### Cosméticos (`/api/cosmetics`)
-
-| Método | Endpoint | Descrição |
-| :--- | :--- | :--- |
-| `GET` | `/api/cosmetics` | Lista todos os cosméticos com filtros e paginação. É público, mas exibe o status `is_acquired` se um token de login for fornecido. |
-| `GET` | `/api/cosmetics/{cosmetic_id}` | Retorna os detalhes de um cosmético específico. Também é público, mas exibe `is_acquired` se logado. |
-| `POST` | `/api/cosmetics/{cosmetic_id}/buy` | **[PROTEGIDO]** Compra um item cosmético individual. Retorna o perfil do usuário atualizado (com novo saldo). |
-| `POST` | `/api/cosmetics/{cosmetic_id}/return` | **[PROTEGIDO]** Devolve um item cosmético individual. Retorna o perfil do usuário atualizado (com novo saldo). |
-
-### Loja e Bundles (`/api/shop`)
-
-| Método | Endpoint | Descrição |
-| :--- | :--- | :--- |
-| `GET` | `/api/shop` | Retorna os dados da loja *ao vivo* da API do Fortnite, enriquecidos com o status `is_acquired` do usuário (se logado). |
-| `POST` | `/api/shop/buy` | **[PROTEGIDO]** Compra uma oferta da loja (item único ou bundle) usando o `offerId`. Retorna o perfil do usuário atualizado. |
-
-### Perfil do Usuário (`/api/profile/me`)
-
-*Todos os endpoints nesta seção são protegidos e requerem um token JWT.*
-
-| Método | Endpoint | Descrição |
-| :--- | :--- | :--- |
-| `GET` | `/api/profile/me` | Retorna os dados do usuário logado (incluindo `id`, `email`, e `vbucks`). |
-| `GET` | `/api/profile/me/inventory` | Retorna o inventário de cosméticos (lista de objetos `CosmeticPublic`) do usuário logado. |
-| `GET` | `/api/profile/me/history` | Retorna o histórico de transações (compras/devoluções) do usuário logado, com os dados dos cosméticos aninhados. |
-
-### Usuários Públicos (`/api/users`)
-
-| Método | Endpoint | Descrição |
-| :--- | :--- | :--- |
-| `GET` | `/api/users` | Retorna uma lista pública e paginada de todos os usuários registrados. |
-| `GET` | `/api/users/{user_id}/inventory` | Retorna o inventário público de cosméticos de um usuário específico. |
+*(Nota: O setup de desenvolvimento local anterior (com Docker Compose para MySQL) foi adaptado para o deploy de produção (PostgreSQL) para atender ao requisito de um link de "deploy" funcional.)*
