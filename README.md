@@ -1,6 +1,6 @@
 # Desafio Técnico - Sistema ESO (Processo Seletivo)
 
-Esta é uma aplicação web full-stack (Frontend + Backend) que implementa uma loja de cosméticos do Fortnite. O projeto foi desenvolvido conforme os requisitos do processo seletivo e está **100% implantado (deployed) na nuvem**.
+Esta é uma aplicação web full-stack (Frontend + Backend) que implementa uma loja de cosméticos do Fortnite. O projeto foi desenvolvido conforme os requisitos do processo seletivo e está **100% implantado  na nuvem**.
 
 ---
 
@@ -16,7 +16,7 @@ Esta é uma aplicação web full-stack (Frontend + Backend) que implementa uma l
 
 ## 🛠️ Tecnologias Utilizadas
 
-* **Frontend:** React 18, Vite, React Router, Axios, Context API.
+* **Frontend:** React 20, Vite, React Router, Axios, Context API.
 * **Backend:** Python 3.11, FastAPI, SQLAlchemy, JWT (Passlib).
 * **Banco de Dados:** PostgreSQL (Hospedado no Render).
 * **Plataforma de Deploy:**
