@@ -3,15 +3,11 @@ from .core.database import engine, Base
 from .models import user, cosmetic, inventory, transaction
 from .routers import auth_router, cosmetic_router, profile_router, user_router, shop_router
 
-# --- IMPORTS DO LIFESPAN ---
 from contextlib import asynccontextmanager
-# 1. REMOVA a importação 'sync_all_cosmetics'
 from .tasks.sync_data import update_shop_status 
 from .core.database import SessionLocal
 import httpx
 from sqlalchemy import text
-# --- FIM DOS IMPORTS ---
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -54,12 +50,22 @@ app = FastAPI(
 
 # Adiciona a middleware de CORS
 from fastapi.middleware.cors import CORSMiddleware
+
+origins = [
+    # Permite o localhost (para desenvolvimento)
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    
+    # 1. A URL do frontend
+    "https://desafio-eso-git-main-matheus-projects-e754.vercel.app",
+
+    "https://eso-api.onrender.com",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        # (No futuro, adicione a URL do seu Vercel aqui)
-    ], 
+    allow_origins=origins, # <-- Usa a nova lista de 'origins'
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
