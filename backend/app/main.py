@@ -3,21 +3,34 @@ from .core.database import engine, Base
 from .models import user, cosmetic, inventory, transaction
 from .routers import auth_router, cosmetic_router, profile_router, user_router, shop_router
 
+# --- IMPORTS DO LIFESPAN ---
 from contextlib import asynccontextmanager
-from .tasks.sync_data import update_shop_status 
+# 1. ADICIONE A IMPORTAÇÃO FALTANTE:
+from .tasks.sync_data import update_shop_status, sync_all_cosmetics 
 from .core.database import SessionLocal
 import httpx
 from sqlalchemy import text
-from .models.cosmetic import Cosmetic
+# --- FIM DOS IMPORTS ---
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Iniciando aplicação...")
     db = SessionLocal()
+    
+    # --- 2. MOVA O CREATE_ALL PARA DENTRO DO LIFESPAN ---
+    # Isso roda ANTES dos workers e previne a 'race condition'
+    try:
+        print("Inicializando tabelas do banco de dados (Base.metadata.create_all)...")
+        Base.metadata.create_all(bind=engine)
+        print("Tabelas inicializadas.")
+    except Exception as e:
+        print(f"ERRO ao inicializar tabelas: {e}")
+    # --- FIM DA MUDANÇA ---
+    
     async with httpx.AsyncClient(timeout=30.0) as client:
         try:
-            #Verifica se a tabela de cosméticos está vazia
+            # --- Lógica de Sync (sem mudanças) ---
             cosmetic_count = db.execute(text("SELECT COUNT(id) FROM cosmetics")).scalar()
             
             if cosmetic_count == 0:
@@ -26,23 +39,20 @@ async def lifespan(app: FastAPI):
             else:
                 print("Banco de dados já populado.")
 
-            #Roda a atualização rápida da loja (sempre)
             print("Rodando 'update_shop_status' para sincronizar a loja...")
             await update_shop_status(db, client)
             print("Sincronização da loja na inicialização concluída.")
-            
             
         except Exception as e:
             print(f"ERRO ao sincronizar a loja na inicialização: {e}")
         finally:
             db.close()
     
-    yield
+    yield 
     print("Desligando aplicação...")
 
-
-
-Base.metadata.create_all(bind=engine)
+# --- O CREATE_ALL FOI REMOVIDO DAQUI ---
+# Base.metadata.create_all(bind=engine) <-- LINHA ANTIGA REMOVIDA
 
 app = FastAPI(
     title="ESO Desafio Fortnite API",
@@ -54,7 +64,10 @@ app = FastAPI(
 from fastapi.middleware.cors import CORSMiddleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"], #porta do React
+    allow_origins=[
+        "http://localhost:5173",
+        # (No futuro, adicione a URL do seu Vercel aqui)
+    ], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -64,7 +77,7 @@ app.add_middleware(
 def read_root():
     return {"message": "Bem-vindo à API do Desafio ESO!"}
 
-#rotas
+# --- Inclui os roteadores ---
 app.include_router(auth_router.router, prefix="/api")
 app.include_router(cosmetic_router.router, prefix="/api")
 app.include_router(profile_router.router, prefix="/api")
