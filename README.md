@@ -52,7 +52,7 @@ http://localhost:5173
 
 ## Endpoints da API
 
-A API estará disponível em `http://localhost:8000`. Todos os endpoints principais são prefixados com `/api/`.
+A API estará disponível em `https://desafio-eso.vercel.app/`. Todos os endpoints principais são prefixados com `/api/`.
 
 Endpoints marcados com **[PROTEGIDO]** requerem um `Bearer Token` no cabeçalho `Authorization`.
 
