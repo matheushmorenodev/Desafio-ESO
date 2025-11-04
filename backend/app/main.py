@@ -65,27 +65,23 @@ origins = [
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:5175",
+    "https://desafio-eso.vercel.app",
     
-    # --- ADICIONE SUAS URLS DE PRODUÇÃO ---
     
-    # A URL de preview do seu Vercel (da imagem)
+    # A URL de preview do seu Vercel 
+    "https://desafio-eso-git-main-matheus-projects-e7534acb.vercel.app",
     "https://desafio-eso-latcomj8-matheus-projects-e7534acb.vercel.app",
     
-    # (Adicione sua URL de produção principal do Vercel aqui quando a tiver)
-    # "https://seu-projeto-final.vercel.app", 
-
-    # A URL da sua API (para garantir)
     "https://eso-api.onrender.com",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins, # <-- Usa a nova lista de 'origins'
+    allow_origins=origins, 
     allow_credentials=True,
-    allow_methods=["*"], # Permite todos os métodos (GET, POST, OPTIONS)
-    allow_headers=["*"], # Permite todos os cabeçalhos (Authorization)
+    allow_methods=["*"], 
+    allow_headers=["*"], 
 )
-# --- FIM DA CORREÇÃO ---
 
 @app.get("/", tags=["Root"])
 def read_root():
