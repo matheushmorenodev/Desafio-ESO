@@ -1,0 +1,10 @@
+services:
+  # Serviço do Frontend (React)
+  frontend:
+    build: . # Constrói o Dockerfile nesta pasta
+    container_name: eso_frontend_service
+    ports:
+      - "5173:5173" # Expõe o Vite no localhost:5173
+    volumes:
+      - .:/app # Mapeia o código-fonte para o Hot-Reloading
+      - /app/node_modules # Impede o node_modules local de sobrescrever o do contêiner

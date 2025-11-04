@@ -1,0 +1,1 @@
+#lógica do register(), login(), get_public_profiles, get_my_history()

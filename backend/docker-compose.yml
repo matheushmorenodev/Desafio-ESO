@@ -1,0 +1,30 @@
+
+services:
+  # Nosso serviço de API (FastAPI)
+  app:
+    build: . # Constrói a imagem a partir do Dockerfile na pasta atual
+    container_name: eso_api
+    ports:
+      - "8000:8000" # Mapeia a porta 8000 do host para a 8000 do contêiner
+    volumes:
+      - ./app:/app/app # "Monta" o código local, para o auto-reload funcionar
+    env_file:
+      - .env # Carrega as variáveis de ambiente do .env
+    depends_on:
+      - db
+
+  # Nosso serviço de Banco de Dados (MySQL)
+  db:
+      image: mysql:8.0
+      container_name: eso_db
+      environment:
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
+        MYSQL_DATABASE: ${MYSQL_DATABASE} 
+      ports:
+        - "3307:3306"
+      volumes:
+        - ./init:/docker-entrypoint-initdb.d
+      
+
+volumes:
+  init: 
