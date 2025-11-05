@@ -66,3 +66,13 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.cosmetic-card {
+  transition: all 0.2s ease-in-out;
+  border: 2px solid transparent;
+}
+.cosmetic-card:hover {
+  transform: scale(1.03);
+  border-color: #00bfff;
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
+}

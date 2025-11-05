@@ -35,7 +35,7 @@ const nameStyle = {
 };
 const typeStyle = {
   fontSize: '0.9rem',
-  color: '#aaa',
+  color: '#b3b3b3',
   marginBottom: '0.5rem',
 };
 const priceStyle = {
@@ -64,6 +64,7 @@ export const CosmeticCard = ({ item, onSelect, isSelected }) => {
 
   return (
     <div 
+      className="cosmetic-card"
       style={isSelected ? selectedCardStyle : cardStyle}
       onClick={() => onSelect(item)}
     >

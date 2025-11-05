@@ -12,7 +12,7 @@ const headerRowStyle = {
   display: 'flex',
   justifyContent: 'space-between',
   padding: '0 0 0.75rem 0', // Padding alinhado com os cards
-  color: '#aaa',
+  color: '#b3b3b3',
   textTransform: 'uppercase',
   fontSize: '0.9rem',
   fontWeight: 'bold',
@@ -107,7 +107,7 @@ return (
           </span>
           
           <span style={typeColStyle}>
-            {tx.type === 'purchase' ? 'Compra' : 'Devolução'}
+            {tx.type === 'purchase' ? '💰 Compra' : '🔁 Devolução'}
           </span>
           
           <span style={{

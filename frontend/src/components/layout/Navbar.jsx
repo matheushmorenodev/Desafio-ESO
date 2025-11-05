@@ -16,6 +16,7 @@ const navStyle = {
   width: '100%',
   zIndex: 1000, // Garante que ela fique na frente de todo o conteúdo
   boxSizing: 'border-box',
+  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
 };
 const linkStyle = {
   color: 'white',
