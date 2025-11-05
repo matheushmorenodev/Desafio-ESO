@@ -11,7 +11,7 @@ const baseStyle = {
   cursor: 'pointer',
   marginTop: '1rem',
   opacity: 1,
-  transition: 'opacity 0.2s',
+  transition: 'opacity 0.2s ease, background-color 0.2s ease',
 };
 
 // Estilos de "Variante" que mudam a cor
@@ -35,8 +35,9 @@ const variants = {
 
 const disabledStyle = {
   ...baseStyle,
-  backgroundColor: '#444',
-  color: '#888',
+  backgroundColor: '#2a2a2a',
+  color: '#808080',
+  opacity: 0.5,
   cursor: 'not-allowed',
 };
 

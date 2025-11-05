@@ -11,7 +11,7 @@ const labelStyle = {
   display: 'block',
   marginBottom: '0.5rem',
   fontWeight: '500',
-  color: '#aaa', 
+  color: '#b3b3b3', 
 };
 
 const inputStyle = {

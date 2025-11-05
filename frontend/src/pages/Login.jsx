@@ -15,7 +15,7 @@ const pageStyle = {
 };
 const formContainerStyle = {
   backgroundColor: '#1e1e1e', 
-  padding: '2rem 3rem',
+  padding: '4rem',
   borderRadius: '8px',
   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
   width: '100%',

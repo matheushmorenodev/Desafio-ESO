@@ -6,7 +6,7 @@ import { Button } from '../ui/Button'; // <-- Importa o botão reutilizável
 // --- Estilos para o painel de detalhes ---
 const detailStyle = {
   backgroundColor: '#1e1e1e',
-  padding: '1.5rem',
+  padding: '2rem',
   borderRadius: '8px',
   color: 'white',
 };
@@ -19,6 +19,13 @@ const imageStyle = {
 const titleStyle = {
   fontSize: '1.8rem',
   fontWeight: 'bold',
+  lineHeight: 1.2,
+};
+const descriptionStyle = {
+  color: '#b3b3b3', // 3. Cor secundária
+  lineHeight: 1.6, // 1. Line-height
+  maxWidth: '75ch', // 4. Limita a largura da linha
+  margin: '1rem 0',
 };
 const infoRowStyle = {
   display: 'flex',
